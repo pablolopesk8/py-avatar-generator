@@ -1,0 +1,42 @@
+# Exclude virtual environment directory (if using one)
+venv/
+build/
+dist/
+
+# Exclude IDE-specific directories
+*.pyc
+__pycache__
+
+# Exclude logs and temporary files
+logs/
+temp/
+
+# Exclude media files
+media/
+
+# Exclude configuration files
+config.py
+
+# Exclude any local development settings or credentials
+.env
+
+# Exclude specific generated files
+output_character.png
+generated_image.*
+
+# Exclude cache directories (if using one)
+.eggs/
+dist/
+env/
+build/
+
+# Exclude all .pyo files (compiled Python files)
+*.pyo
+
+# Exclude temporary files
+.DS_Store
+Thumbs.db
+
+# Exclude any other sensitive or development-related files
+development.log
+debug.log
