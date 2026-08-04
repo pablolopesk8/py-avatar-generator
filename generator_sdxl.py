@@ -2,10 +2,9 @@ import gc
 import logging
 import sys
 import torch
-from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
+from diffusers import StableDiffusionXLPipeline, EulerDiscreteScheduler
 from diffusers.utils import logging as diffusers_logging
-# from diffusers import StableDiffusionXLPipeline, DPMSolverMultistepScheduler
-from config_generation import GenerationConfig
+from config_sdxl_realistic import GenerationConfig
 
 # Silencia avisos informativos/warnings de licença do Diffusers
 diffusers_logging.set_verbosity_error()
@@ -24,41 +23,35 @@ def clear_vram() -> None:
     if torch.backends.mps.is_available():
         torch.mps.empty_cache()
 
-def build_pipeline(config: GenerationConfig, device: torch.device) -> StableDiffusionPipeline:
-# def build_pipeline(config: GenerationConfig, device: torch.device) -> StableDiffusionXLPipeline:
+def build_pipeline(config: GenerationConfig, device: torch.device) -> StableDiffusionXLPipeline:
     """Carrega o pipeline com otimizações extremas de memória para 8GB M1."""
-    print(f"[INFO] Carregando modelo '{config.model_id}' em float32...")
+    print(f"[INFO] Carregando modelo SDXL '{config.model_id}' em float16...")
     
-    pipe = StableDiffusionPipeline.from_pretrained(
+    pipe = StableDiffusionXLPipeline.from_pretrained(
         config.model_id,
-        torch_dtype=torch.float32,
+        torch_dtype=torch.float16,
         use_safetensors=True,
         token=config.hf_token,
-        safety_checker=None,
-        feature_extractor=None
     )
-    # pipe = StableDiffusionXLPipeline.from_single_file(
-    #     "https://huggingface.co/RunDiffusion/Juggernaut-XL-v9/blob/main/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors",
-    #     torch_dtype=torch.float16,
-    #     token=config.hf_token
-    # ).to("cpu")
 
-    pipe.vae.to(dtype=torch.float32)
+    pipe.vae.to(dtype=torch.float16)
 
-    pipe.scheduler = DPMSolverMultistepScheduler.from_config(
+    # Scheduler otimizado para SDXL
+    pipe.scheduler = EulerDiscreteScheduler.from_config(
         pipe.scheduler.config, 
-        use_karras_sigmas=True
+        timestep_spacing="trailing"
     )
 
-    # 1. Ativa offload de submodelos para a CPU (Text Encoder, UNet, VAE) conforme necessário
-    pipe.enable_sequential_cpu_offload(gpu_id=0)
+    # --- OTIMIZAÇÕES CRÍTICAS PARA 8GB RAM M1 ---
+    # Transfere submódulos (TextEncoder1, TextEncoder2, UNet, VAE) para a GPU/MPS somente no momento do cálculo
+    pipe.enable_model_cpu_offload()
 
-    # 2. Slice de Atenção: reduz pico de memória no cálculo do Attention Map
+    # Slice de Atenção: reduz pico de memória no cálculo do Attention Map
     pipe.enable_attention_slicing(slice_size="auto")
 
-    # 3. Decodificação VAE em chunks para evitar estourar RAM no pós-processamento
-    # pipe.enable_vae_slicing()
+    # Decodificação VAE em chunks para evitar estourar RAM no pós-processamento
     pipe.vae.enable_slicing()
+    pipe.vae.enable_tiling()
 
     return pipe
 
