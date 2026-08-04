@@ -5,7 +5,7 @@ import torch
 from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 from diffusers.utils import logging as diffusers_logging
 # from diffusers import StableDiffusionXLPipeline, DPMSolverMultistepScheduler
-from config import GenerationConfig
+from config_generation import GenerationConfig
 
 # Silencia avisos informativos/warnings de licença do Diffusers
 diffusers_logging.set_verbosity_error()
