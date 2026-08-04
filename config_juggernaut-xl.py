@@ -24,4 +24,3 @@ class GenerationConfig:
     guidance_scale: float = 1.5  # SDXL Lightning usa CFG baixo (1.5-2.0)
     seed: int = 42
     output_path: str = f"sdxl_realistic_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
-    hf_token: str = "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"
