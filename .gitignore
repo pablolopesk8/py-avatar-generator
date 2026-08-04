@@ -4,8 +4,6 @@ build/
 dist/
 
 # Exclude IDE-specific directories
-*.pyc
-__pycache__
 
 # Exclude logs and temporary files
 logs/
@@ -15,7 +13,6 @@ temp/
 media/
 
 # Exclude configuration files
-config.py
 
 # Exclude any local development settings or credentials
 .env
