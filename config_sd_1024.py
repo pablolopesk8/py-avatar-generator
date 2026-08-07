@@ -27,5 +27,5 @@ class GenerationConfig:
     steps: int = 30
     guidance_scale: float = 6.0 # Guidance mais baixo evita superexposição e pele de cera
     seed: int = 101
-    output_path: str = datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    output_path: str = f"sd1024_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
     hf_token: str = os.getenv("HF_TOKEN")

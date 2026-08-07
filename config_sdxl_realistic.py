@@ -11,7 +11,7 @@ load_dotenv()
 class GenerationConfig:
     # Juggernaut-XL v9 / Lightning ou Refiner otimizado
     # Usaremos a versão Lightning/FP16 que exige menos passos e reduz uso de VRAM
-    model_id: str = "SG161222/RealVisXL_V5.0_Lightning" # Ou "RunDiffusion/Juggernaut-XL-v9"
+    model_id: str = "SG161222/RealVisXL_V5.0_Lightning"
 
     # SDXL entende linguagem natural corrida muito melhor que o SD 1.5
     prompt: str = (
